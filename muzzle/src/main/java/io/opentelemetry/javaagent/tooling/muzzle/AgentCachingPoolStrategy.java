@@ -6,8 +6,6 @@
 package io.opentelemetry.javaagent.tooling.muzzle;
 
 import io.opentelemetry.instrumentation.api.cache.Cache;
-import java.lang.ref.WeakReference;
-import javax.annotation.Nullable;
 import net.bytebuddy.agent.builder.AgentBuilder;
 import net.bytebuddy.description.annotation.AnnotationList;
 import net.bytebuddy.description.method.MethodDescription;
@@ -16,6 +14,9 @@ import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.description.type.TypeList;
 import net.bytebuddy.dynamic.ClassFileLocator;
 import net.bytebuddy.pool.TypePool;
+import javax.annotation.Nullable;
+import java.lang.ref.WeakReference;
+import java.util.logging.Logger;
 
 /**
  *
@@ -37,7 +38,12 @@ public class AgentCachingPoolStrategy implements AgentBuilder.PoolStrategy {
   // Many things are package visible for testing purposes --
   // others to avoid creation of synthetic accessors
 
-  static final int TYPE_CAPACITY = 64;
+  static final int TYPE_CAPACITY = Integer.getInteger("applicationinsights.debug.cache_size", 64);
+
+  static {
+    Logger.getLogger("com.microsoft.applicationinsights.agent")
+        .info("AgentCachingPoolStrategy capacity: " + TYPE_CAPACITY);
+  }
 
   static final int BOOTSTRAP_HASH = 7236344; // Just a random number
 
